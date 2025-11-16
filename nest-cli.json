@@ -10,16 +10,7 @@
   "monorepo": true,
   "root": "apps/user",
   "projects": {
-    "delevery": {
-      "type": "application",
-      "root": "apps/delevery",
-      "entryFile": "main",
-      "sourceRoot": "apps/user/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/user/tsconfig.app.json"
-      }
-    },
-    "user": {
+   "user": {
       "type": "application",
       "root": "apps/user",
       "entryFile": "main",
@@ -28,5 +19,6 @@
         "tsConfigPath": "apps/user/tsconfig.app.json"
       }
     }
+    
   }
 }

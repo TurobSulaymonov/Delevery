@@ -1,4 +1,4 @@
- # 어떤 이미지를 사용할지
+# 어떤 이미지를 사용할지
 FROM node:alpine AS development
 
 WORKDIR /usr/src/app

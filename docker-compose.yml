@@ -1,35 +1,35 @@
-version: '3.1'
-
+version: '3.8'
 
 services:
-   user:
-     build:
-         context: .
-         dockerfile: ./apps/user/DockerFile
-         target: development
-     command: pnpm run start:dev user
-     depends_on:
-         postgres_user:
-            condition: service_healthy
-     ports:
-     - '3001:3000'
-     volumes:
-       - .:/usr/src/app
-       - /usr/src/app/node_modules
-  
-   
+  user:
+    build:
+      context: .
+      dockerfile: ./apps/user/DockerFile
+      target: development
+    command: pnpm run start:dev user
+    depends_on:
+      postgres_user:
+        condition: service_healthy
+    ports:
+      - '3001:3001'
+    environment:
+      HTTP_PORT: 3001
+      DB_URL: postgresql://postgres:postgres@postgres_user:5432/postgres
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
 
-   postgres_user:
-     image: postgres:16
-     environment:
-       POSTGRES_USER: postgres
-       POSTGRES_PASSWORD: postgres
-       POSTGRES_DB: postgres
-     ports:
+  postgres_user:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
       - '6001:5432'
-     volumes: 
+    volumes:
       - ./postgres/user:/var/lib/postgresql/data
-     healthcheck: 
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s

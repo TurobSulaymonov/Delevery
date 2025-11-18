@@ -1,5 +1,5 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { OrderModule } from './order/order.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,7 +8,6 @@ import { MongooseModule } from '@nestjs/mongoose';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './apps/user/.env',
       validationSchema: Joi.object({
         DB_URL: Joi.string().required(),
       }),

@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ProductModule } from './product/product.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './apps/user/.env',
       validationSchema: Joi.object({
+        HTTP_PORT: Joi.string().required(),
         DB_URL: Joi.string().required(),
       }),
     }),

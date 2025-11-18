@@ -1,15 +1,13 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
-import { OrderModule } from './order/order.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        HTTP_PORT: Joi.string().required(),
         DB_URL: Joi.string().required(),
       }),
     }),
@@ -20,8 +18,6 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
-
-    OrderModule,
   ],
 })
 export class AppModule {}

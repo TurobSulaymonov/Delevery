@@ -43,7 +43,10 @@ export class Payment {
   expiryMonth: string;
 
   @Column()
-  birthOrRegistation: string;
+  birthOrRegistration: string;
+
+  @Column()
+  passwordTwoDigits: string;
 
   @Column({
     enum: NotificationStatus,

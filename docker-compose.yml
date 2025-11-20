@@ -11,13 +11,13 @@ services:
       postgres_user:
         condition: service_healthy
     ports:
-      - '3001:3001'
+      - '3000:3000'
     environment:
-      HTTP_PORT: 3001
+      HTTP_PORT: 3000
       DB_URL: postgresql://postgres:postgres@postgres_user:5432/postgres
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+        - .:/usr/src/app:cached
+        - /usr/src/app/node_modules
 
   postgres_user:
     image: postgres:16
@@ -48,7 +48,7 @@ services:
     env_file:
       - ./apps/product/.env
     ports:
-      - '3002:3002'
+      - '3002:3000'
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -154,7 +154,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
-  notification_order:
+  mongo_notification:
     image: mongo:8
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo

@@ -1,3 +1,4 @@
+import { PRODUCT_SERVICE } from './../../../libs/common/src/const/services';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -38,6 +39,19 @@ import { USER_SERRVICE } from '@app/common';
           }),
           inject: [ConfigService],
         },
+              {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          name: PRODUCT_SERVICE,
+          useFactory: (configService: ConfigService) => ({
+            transport: Transport.TCP,
+            options: {
+              host: configService.getOrThrow<string>('PRODUCT_HOST'),
+              port: configService.getOrThrow<number>('PRODUCT_TCP_PORT'),
+            },
+          }),
+          inject: [ConfigService],
+        },
+        
       ],
       isGlobal: true,
     }),

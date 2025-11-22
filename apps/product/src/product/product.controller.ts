@@ -1,5 +1,8 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductService } from './product.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { GetProductsInfoDto } from './dto/get-product-info.dto';
+import { RpcInterceptor } from '@app/common/interceptor/rpc.interceptor';
 
 @Controller('product')
 export class ProductController {
@@ -9,4 +12,12 @@ export class ProductController {
   createSamples() {
     return this.productService.createSamples();
   }
+
+  @MessagePattern({cmd: 'get_products_info'})
+  @UsePipes(ValidationPipe)
+  @UseInterceptors(RpcInterceptor)
+ getProductsInfo (@Payload() data: GetProductsInfoDto) {
+  return this.productService.getProductsInfo(data.productIds)
+}
+
 }

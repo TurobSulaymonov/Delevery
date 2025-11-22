@@ -6,6 +6,7 @@ import {
 } from './delivery-address.entity';
 import { Product, ProductSchema } from './product.entity';
 import { Customer, CustomerSchema } from './customer.entity';
+import { Document } from 'mongoose';
 
 export enum OrderStatus {
   pending = 'Pending',
@@ -25,7 +26,7 @@ export class Order extends Document {
   customer: Customer;
 
   @Prop({
-    type: ProductSchema,
+    type: [ProductSchema],
     required: true,
   })
   products: Product[];

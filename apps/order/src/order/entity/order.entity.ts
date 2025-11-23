@@ -6,10 +6,10 @@ import {
 } from './delivery-address.entity';
 import { Product, ProductSchema } from './product.entity';
 import { Customer, CustomerSchema } from './customer.entity';
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export enum OrderStatus {
-  pending = 'Pending',
+  paymentPending = 'paymentPending',
   paymentCancelled = 'PaymentCanselled',
   paymentFailed = 'PaymentFailed',
   paymentProcessed = 'PaymentProcessed',
@@ -18,7 +18,7 @@ export enum OrderStatus {
 }
 
 @Schema()
-export class Order extends Document {
+export class Order extends Document<ObjectId> {
   @Prop({
     type: CustomerSchema,
     required: true,
@@ -39,7 +39,7 @@ export class Order extends Document {
 
   @Prop({
     enum: OrderStatus,
-    default: OrderStatus.pending,
+    default: OrderStatus.paymentPending,
   })
   status: OrderStatus;
 

@@ -3,14 +3,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { PRODUCT_SERVICE, USER_SERRVICE } from '@app/common';
+import { PAYMENT_SERVICE, PRODUCT_SERVICE, USER_SERRVICE } from '@app/common';
 import { PaymentCancelledException } from './exception/payment-cancelled.exception';
 import { Product } from './entity/product.entity';
 import { Customer } from './entity/customer.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Order } from './entity/order.entity';
+import { Order, OrderStatus } from './entity/order.entity';
 import { Model } from 'mongoose';
 import { PaymentDto } from './dto/payments.dto';
+import { Payment } from './entity/payment.entity';
+import { PaymentFailedException } from './exception/payment-failed.exception';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +21,8 @@ export class OrderService {
     private readonly userService: ClientProxy,
     @Inject(PRODUCT_SERVICE)
     private readonly productService: ClientProxy,
+    @Inject(PAYMENT_SERVICE)
+    private readonly paymentService: ClientProxy,
     @InjectModel(Order.name)
     private readonly orderModel: Model<Order>
   ) {}
@@ -42,6 +46,11 @@ export class OrderService {
      // 5) 주문 생성하기 = 데이터베이스에 넣기 
      const customer = this.createCustomer(user);
      const order = await this.createNewOrder(customer, products, address, payment)
+
+    // 6) 결제 시도하기
+    const processPayment = await this.processPayment(order._id.toString(), payment, user.email)
+    // 7) 결과 반환하기
+    return this.orderModel.findById(order._id)
   }
 
   private async getUserFromToken(token: string) {
@@ -114,5 +123,70 @@ export class OrderService {
     payment,
    })
   }
+private async processPayment(
+  orderId: string,
+  payment: PaymentDto,
+  userEmail: string
+) {
+  try {
+    // 1) Payment MS-ga so‘rov jo‘natish
+    const resp = await lastValueFrom(
+      this.paymentService.send(
+        { cmd: 'make_payment' },
+        { ...payment, userEmail }
+      )
+    );
+
+    if (resp.status === 'error') {
+      throw new PaymentFailedException(resp.error || '결제 오류가 발생했습니다.');
+    }
+
+    const status = resp.data?.paymentStatus || resp.paymentStatus;
+
+    // 2) Pending bo‘lsa -> order holati PaymentPending
+    if (status === 'Pending') {
+      await this.orderModel.findByIdAndUpdate(orderId, {
+        status: OrderStatus.paymentPending,
+      });
+
+      return {
+        status: 'pending',
+        message: '결제가 진행 중입니다.',
+      };
+    }
+
+    // 3) Approved bo‘lsa -> success
+    if (status === 'Approved') {
+      await this.orderModel.findByIdAndUpdate(orderId, {
+        status: OrderStatus.paymentProcessed,
+      });
+
+      return {
+        status: 'success',
+        message: '결제가 완료되었습니다.',
+        data: resp.data,
+      };
+    }
+
+    // 4) Boshqa holatlar → Rejected, Failed, Error
+    await this.orderModel.findByIdAndUpdate(orderId, {
+      status: OrderStatus.paymentFailed,
+    });
+
+    throw new PaymentFailedException('결제가 승인되지 않았습니다.');
+
+  } catch (e) {
+    // 5) General catch
+    if (e instanceof PaymentFailedException) {
+      await this.orderModel.findByIdAndUpdate(orderId, {
+        status: OrderStatus.paymentFailed,
+      });
+    }
+
+    throw e;
+  }
+}
+
+
 
 }

@@ -7,7 +7,7 @@ export class Product {
   @Prop({
     required: true,
   })
-  productId: string;
+  productId?: string;
 
   @Prop({
     required: true,

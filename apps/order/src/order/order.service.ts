@@ -133,7 +133,9 @@ private async processPayment(
     const resp = await lastValueFrom(
       this.paymentService.send(
         { cmd: 'make_payment' },
-        { ...payment, userEmail }
+        { ...payment, userEmail , orderId},
+        
+        
       )
     );
 
@@ -187,6 +189,8 @@ private async processPayment(
   }
 }
 
-
+changeOrderStatus(orderId: string, status: OrderStatus) {
+  return this.orderModel.findByIdAndUpdate(orderId, {status})
+}
 
 }

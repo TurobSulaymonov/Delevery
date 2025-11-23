@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { PAYMENT_SERVICE, PRODUCT_SERVICE, USER_SERRVICE } from '@app/common';
+import { PAYMENT_SERVICE, PRODUCT_SERVICE, USER_SERVICE } from '@app/common';
 import { PaymentCancelledException } from './exception/payment-cancelled.exception';
 import { Product } from './entity/product.entity';
 import { Customer } from './entity/customer.entity';
@@ -17,7 +17,7 @@ import { PaymentFailedException } from './exception/payment-failed.exception';
 @Injectable()
 export class OrderService {
   constructor(
-    @Inject(USER_SERRVICE)
+    @Inject(USER_SERVICE)
     private readonly userService: ClientProxy,
     @Inject(PRODUCT_SERVICE)
     private readonly productService: ClientProxy,

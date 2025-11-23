@@ -5,7 +5,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { OrderModule } from './order/order.module';
-import { USER_SERRVICE } from '@app/common';
+import { USER_SERVICE } from '@app/common';
 
 @Module({
   imports: [
@@ -34,7 +34,7 @@ import { USER_SERRVICE } from '@app/common';
       clients: [
         {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          name: USER_SERRVICE,
+          name: USER_SERVICE,
           useFactory: (configService: ConfigService) => ({
             transport: Transport.TCP,
             options: {

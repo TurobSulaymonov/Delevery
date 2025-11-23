@@ -1,6 +1,19 @@
 
 
 services:
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/DockerFile
+      target: development
+    command: pnpm run start:dev gateway
+    env_file:
+      - ./apps/gateway/.env
+    ports:
+      - '3000:3000'
+    volumes:
+        - .:/usr/src/app:cached
+        - /usr/src/app/node_modules
   user:
     build:
       context: .
@@ -11,10 +24,7 @@ services:
       postgres_user:
         condition: service_healthy
     ports:
-      - '3000:3000'
-    environment:
-      HTTP_PORT: 3000
-      DB_URL: postgresql://postgres:postgres@postgres_user:5432/postgres
+      - '3001:3000'
     volumes:
         - .:/usr/src/app:cached
         - /usr/src/app/node_modules
